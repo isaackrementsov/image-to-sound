@@ -7,7 +7,7 @@ Web app that separates an image into its pixels, reads the color frequencies, an
 At the moment, the app does not use any databases, so it is fairly self-contained.
 
 However, you will need to make sure you have
-* NodeJS (Tested on v8.11.4)
+* NodeJS (Tested on `v8.11.4`)
 * Typescript (`npm i -g typescript`)
 * All included modules in working directory (`npm i`)
 * A server with a maximum file upload size set above `5M`
