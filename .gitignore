@@ -1,2 +1,5 @@
 /node_modules
 package-lock.json
+/public/img/uploads
+
+!/public/img/uploads/a.txt

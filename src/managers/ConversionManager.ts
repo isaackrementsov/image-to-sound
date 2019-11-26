@@ -12,7 +12,7 @@ export default class ConversionManager {
         let imageProcessor = new ImageManager(sideChunksX, sideChunksY, height, width);
         let image = await Jimp.read(this.filename);
         imageProcessor.processPixels(image);
-
+        
         console.log(imageProcessor.chunks);
     }
 
