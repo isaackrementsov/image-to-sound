@@ -33,6 +33,8 @@
     "ejs": "^2.7.2",
     "express": "^4.17.1",
     "express-session": "^1.17.0",
-    "reflect-metadata": "^0.1.13"
+    "jimp2": "^2.0.0",
+    "reflect-metadata": "^0.1.13",
+    "shortid": "^2.2.15"
   }
 }

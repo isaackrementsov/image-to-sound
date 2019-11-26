@@ -1,8 +1,86 @@
 <% include partials/header %>
-    <h1>Image to Sound</h1>
+    <style>
+        form > * {
+            display: block;
+            margin: 10px 0;
+        }
+    </style>
+    <h1>Sound Portrait</h1>
     <% include partials/error %>
     <form method="POST" action="/" enctype="multipart/form-data">
-        <input type="file" name="image">
+        <input type="file" name="image" oninput="recordDimensions()" id="file" accept=".png,.svg,.bmp,.jpeg,.jpg" required>
+        <input type="hidden" name="height" id="height">
+        <input type="hidden" name="width" id="width">
+        <input type="number" name="numberChunksX" placeholder="Horizontal image partitions" id="numberChunksX" oninput="drawGrid()" step="1" min="1" required>
+        <input type="number" name="numberChunksY" placeholder="Vertical image partitions" id="numberChunksY" oninput="drawGrid()" step="1" min="1" required>
+        <p>Size: <span id="height-info">0</span> x <span id="width-info">0</span></p>
+        <canvas id="preview" src="" style="height: 200px; display: none; background-size: cover"></canvas>
         <input type="submit" value="Process">
     </form>
+    <script>
+        let height;
+        let width;
+        let chunksX = document.getElementById('numberChunksX');
+        let chunksY = document.getElementById('numberChunksY');
+
+        function recordDimensions(){
+            let input = document.getElementById('file');
+
+            if(input.files && input.files[0]){
+                let image = new Image();
+
+                image.src = window.URL.createObjectURL(input.files[0]);
+
+                let preview = document.getElementById('preview');
+                preview.style.display = 'block';
+                preview.style.backgroundImage = `url('${image.src}')`;
+
+                image.onload = () => {
+                    height = image.naturalHeight;
+                    width = image.naturalWidth;
+
+                    document.getElementById('width').value = image.naturalWidth;
+                    document.getElementById('width-info').innerHTML = image.naturalWidth;
+
+                    document.getElementById('height').value = image.naturalHeight;
+                    document.getElementById('height-info').innerHTML = image.naturalHeight;
+
+                    preview.style.width = `${image.naturalWidth * 200 / image.naturalHeight}px`;
+
+                    if(chunksX.value && chunksY.value){
+                        drawGrid();
+                    }
+                }
+            }
+        }
+
+        function drawGrid(){
+            if(height && width && chunksX.value && chunksY.value){
+                let preview = document.getElementById('preview');
+                let ctx = preview.getContext('2d');
+                ctx.clearRect(0, 0, preview.width, preview.height);
+                ctx.beginPath();
+                ctx.strokeStyle = 'white';
+
+                let yChunkSize = preview.height / chunksY.value;
+                let xChunkSize = preview.width / chunksX.value;
+
+                for(let i = 0; i < chunksX.value + 1; i++){
+                    let posX = xChunkSize * i;
+
+                    ctx.moveTo(posX, 0);
+                    ctx.lineTo(posX, preview.height);
+                    ctx.stroke();
+                }
+
+                for(let i = 0; i < chunksY.value + 1; i++){
+                    let posY = yChunkSize * i;
+
+                    ctx.moveTo(0, posY);
+                    ctx.lineTo(preview.width, posY);
+                    ctx.stroke();
+                }
+            }
+        }
+    </script>
 <% include partials/footer %>

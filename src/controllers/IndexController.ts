@@ -2,6 +2,8 @@
 
 import {Request, Response} from 'express';
 import * as Busboy from 'busboy';
+import * as shortId from 'shortid';
+import * as fs from 'fs';
 import ConversionManager from '../managers/ConversionManager';
 
 export default class IndexController {
@@ -17,16 +19,35 @@ export default class IndexController {
             // Busboy is used so that the file can be streamed directly, instead of being saved and processed
             // This is better performance-wise, but it might be a good idea to change this for the sake of stability
             let busboy = new Busboy({headers: req.headers, limits: {fileSize: 5000000}});
+            let converter;
 
             req.pipe(busboy);
+
+            busboy.on('field', (key, val) => req.body[key] = val);
 
             busboy.on('file', async (_fieldname, file, filename, _encoding, mimetype) => {
                 if(mimetype.indexOf('image/') == -1){
                     req.flash('error', 'Invalid file type');
                 }else{
-                    let converter = new ConversionManager(file, filename);
-                    let audio = await converter.convert();
+                    let errored = false;
+                    let saveTo = __dirname + '../../../public/img/uploads/' + shortId.generate() + filename;
+                    converter = new ConversionManager(saveTo);
+
+                    file.on('limit', () => {
+                        errored = true;
+                    });
+
+                    file.pipe(fs.createWriteStream(saveTo));
                 }
+            });
+
+            busboy.on('finish', async () => {
+                let audio = await converter.convert(
+                    parseInt(req.body.height),
+                    parseInt(req.body.width),
+                    parseInt(req.body.numberChunksX),
+                    parseInt(req.body.numberChunksY)
+                );
             });
 
             res.redirect('/');
