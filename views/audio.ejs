@@ -50,7 +50,10 @@
     }
 
     playerBar.onclick = e => {
-        playAudio();
+        if(!playing){
+            playAudio();
+        }
+        
         audio.currentTime = (e.clientX - playerBar.offsetLeft)/(playerBar.offsetWidth - 10) * duration;
     }
 </script>
