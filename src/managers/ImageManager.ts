@@ -1,4 +1,4 @@
-let Jimp = require('jimp2');
+const Jimp = require('jimp');
 
 export default class ImageManager {
 
@@ -29,7 +29,7 @@ export default class ImageManager {
         let l =  620 - 170 / 270 * hue;
         let c = 2.99792458;
 
-        // f = c/l, but f*10^-17
+        // f = c/l, but f*10^-17, multiply by 10^5 to get THZ
         return c / l;
     }
 

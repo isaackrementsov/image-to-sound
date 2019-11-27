@@ -46,7 +46,9 @@ export default class IndexController {
                     parseInt(req.body.height),
                     parseInt(req.body.width),
                     parseInt(req.body.numberChunksX),
-                    parseInt(req.body.numberChunksY)
+                    parseInt(req.body.numberChunksY),
+                    parseFloat(req.body.blockDuration),
+                    req.body.mappingFunction
                 );
             });
 

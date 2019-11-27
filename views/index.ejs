@@ -4,24 +4,36 @@
             display: block;
             margin: 10px 0;
         }
+        .italic {
+            font-style: italic;
+        }
     </style>
     <h1>Sound Portrait</h1>
     <% include partials/error %>
-    <form method="POST" action="/" enctype="multipart/form-data">
+    <form method="POST" action="/" enctype="multipart/form-data" onsubmit="return validateFunc()">
         <input type="file" name="image" oninput="recordDimensions()" id="file" accept=".png,.svg,.bmp,.jpeg,.jpg" required>
         <input type="hidden" name="height" id="height">
         <input type="hidden" name="width" id="width">
         <input type="number" name="numberChunksX" placeholder="Horizontal image partitions" id="numberChunksX" oninput="drawGrid()" step="1" min="1" required>
         <input type="number" name="numberChunksY" placeholder="Vertical image partitions" id="numberChunksY" oninput="drawGrid()" step="1" min="1" required>
+        <input type="number" name="blockDuration" placeholder="Time per block (s)" step="0.001" min="0" required>
         <p>Size: <span id="height-info">0</span> x <span id="width-info">0</span></p>
         <canvas id="preview" src="" style="height: 200px; display: none; background-size: cover"></canvas>
+        <p>Image color frequency <span class="italic">f</span> (THZ) to sound frequency <span class="italic">s</span> (HZ) mapping</p>
+        <p>Supported functions: log, sin, cos, tan</p>
+        <p>Ex: s = e^f + 3*f^2 - log(f + 2) + sin(3 / f)</p>
+        <p>s = <input type="text" id="mappingFunction" oninput="parseFunction()" value="f" required></p>
+        <input type="hidden" name="mappingFunction" id="mappingFunctionParsed">
         <input type="submit" value="Process">
     </form>
     <script>
         let height;
         let width;
+        let validFunc = false;
         let chunksX = document.getElementById('numberChunksX');
         let chunksY = document.getElementById('numberChunksY');
+
+        parseFunction();
 
         function recordDimensions(){
             let input = document.getElementById('file');
@@ -81,6 +93,34 @@
                     ctx.stroke();
                 }
             }
+        }
+
+        function parseFunction(){
+            let statement = document.getElementById('mappingFunction').value;
+
+            statement = statement.replace(' ','');
+            statement = statement.replace(/([1-9]|[a-z])\^([1-9]|[a-z])/g, p => `Math.pow(${p[0]}, ${p[2]})`);
+            statement = statement.replace(/log|cos|sin|tan/gi, f => `Math.${f}`);
+            statement = statement.replace(/e|pi/gi, k => `Math.${k.toUpperCase()}`);
+            validFunc = true;
+
+            try {
+                let func = f => eval(statement);
+                func(1);
+            }catch(e){
+                validFunc = false;
+                document.getElementById('mappingFunction').style.borderColor = 'coral';
+            }
+
+            if(validFunc){
+                document.getElementById('mappingFunction').style.borderColor = 'initial';
+            }
+
+            document.getElementById('mappingFunctionParsed').value = statement;
+        }
+
+        function validateFunc(){
+            return validFunc;
         }
     </script>
 <% include partials/footer %>
