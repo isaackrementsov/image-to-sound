@@ -9,14 +9,16 @@ export default class ConversionManager {
     filename : string;
 
     // Process the image in chunks to prevent heap overflows
-    async convert(height: number, width: number, sideChunksX: number, sideChunksY: number, lengthPerChunk: number, transformFunction: string){
+    async convert(height: number, width: number, sideChunksX: number, sideChunksY: number, lengthPerChunk: number, transformFunction: string, cb: (string, number) => void){
         let imageProcessor = new ImageManager(sideChunksX, sideChunksY, height, width);
         let image = await Jimp.read(this.filename);
-        imageProcessor.processPixels(image);
+
+        await imageProcessor.processPixels(image, this.filename);
 
         let transformFunc = f => eval(transformFunction);
         let audioProcessor = new AudioManager(lengthPerChunk, imageProcessor.chunks, transformFunc);
-        audioProcessor.playAudio();
+
+        audioProcessor.generateAudio(cb);
     }
 
     constructor(filename: string){

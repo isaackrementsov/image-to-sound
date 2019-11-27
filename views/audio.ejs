@@ -1,0 +1,57 @@
+<% include partials/header %>
+<h1>Sound Portrait</h1>
+<audio id="audio">
+    <source src="<%= path %>" type="audio/wav">
+</audio>
+<div class="fakeAudio">
+    <div class="play" id="play" onclick="playAudio()"><i class="material-icons">play_arrow</i></div>
+    <%
+        let t = duration;
+        let h = Math.floor(t/3600);
+        let m = Math.floor(t/60) % 60;
+        let s = Math.floor(t) % 60;
+        let str = `${h > 0 ? h + ':': ''}${m > 0 ? ((m < 10 && h > 0) ? '0' + m : m ): '0'}:${s < 10 ? '0' + s : s }`;
+    %>
+    <div class="duration"><span id="current">0:00</span> <span> / <%= str %></span></div>
+    <div class="player-bar" id="player-bar"><div class="circle" id="circle"></div></div>
+    <a class="download" href="<%= path %>" download><i class="material-icons">cloud_download</i></a>
+</div>
+<script>
+    let circle = document.getElementById('circle');
+    let playerBar = document.getElementById('player-bar');
+    let audio = document.getElementById('audio');
+    let currentTime = document.getElementById('current');
+    let playing = false;
+    let seconds = 0;
+    let duration = <%= duration %>;
+
+    audio.ontimeupdate = _e => {
+        let t = audio.currentTime > duration ? duration : audio.currentTime;
+        let h = Math.floor(t/3600);
+        let m = Math.floor(t/60) % 60;
+        let s = Math.floor(t) % 60;
+        currentTime.innerHTML = `${h > 0 ? h + ':': ''}${m > 0 ? ((m < 10 && h > 0) ? '0' + m : m ): '0'}:${s < 10 ? '0' + s : s }`;
+        circle.style.left = playerBar.offsetWidth * t / duration - 10 + 'px';
+
+    }
+
+    audio.onended = _e => {
+        playAudio();
+    }
+
+    function playAudio(){
+        if(playing) audio.pause();
+        else audio.play();
+
+        let icon = playing ? 'play_arrow' : 'pause';
+        document.getElementById('play').innerHTML = `<i class="material-icons">${icon}</i>`;
+
+        playing = !playing;
+    }
+
+    playerBar.onclick = e => {
+        playAudio();
+        audio.currentTime = (e.clientX - playerBar.offsetLeft)/(playerBar.offsetWidth - 10) * duration;
+    }
+</script>
+<% include partials/footer %>

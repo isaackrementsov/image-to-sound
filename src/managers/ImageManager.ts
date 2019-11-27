@@ -1,4 +1,6 @@
 const Jimp = require('jimp');
+import * as fs from 'fs';
+import { unlink } from '../util/promises';
 
 export default class ImageManager {
 
@@ -41,7 +43,7 @@ export default class ImageManager {
         this.chunks[j][i].length++;
     }
 
-    processPixels(image){
+    async processPixels(image, path: string){
         for(let x = 0; x < this.dimensions.x; x++){
             for(let y = 0; y < this.dimensions.y; y++){
                 // Get RGB triplet
@@ -52,6 +54,8 @@ export default class ImageManager {
                 this.assignToChunk(freq, x, y);
             }
         }
+
+        await unlink(path);
     }
 
     constructor(sideChunksX: number, sideChunksY: number, height: number, width: number){

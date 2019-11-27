@@ -41,18 +41,19 @@ export default class IndexController {
                 }
             });
 
-            busboy.on('finish', async () => {
-                let audio = await converter.convert(
+            busboy.on('finish', () => {
+                converter.convert(
                     parseInt(req.body.height),
                     parseInt(req.body.width),
                     parseInt(req.body.numberChunksX),
                     parseInt(req.body.numberChunksY),
                     parseFloat(req.body.blockDuration),
-                    req.body.mappingFunction
+                    req.body.mappingFunction,
+                    (audioPath, duration) => {
+                        res.redirect(`/audio?p=${audioPath}&d=${duration}`);
+                    }
                 );
             });
-
-            res.redirect('/');
         }catch(e){
             if(!res.headersSent){
                 req.flash('error', 'There was an error processing the file');
