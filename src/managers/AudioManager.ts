@@ -1,6 +1,7 @@
 const Generator = require('audio-generator/stream');
 import * as wavConverter from 'wav-converter';
 import * as fs from 'fs';
+import * as path from 'path';
 import * as shortId from 'shortid';
 import { writeFile, unlink } from '../util/promises';
 
@@ -17,7 +18,7 @@ export default class AudioManager {
 
     generateAudio(cb: (string, number) => void){
         let partialPath = '/img/uploads/' + shortId.generate();
-        let saveTo = __dirname + '../../../public' + partialPath;
+        let saveTo = path.join(__dirname, '/../../public' + partialPath);
         let pcmPath = saveTo + '.pcm';
         let duration = this.chunks.length * this.lengthPerChunk;
 

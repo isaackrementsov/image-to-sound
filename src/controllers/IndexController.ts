@@ -4,6 +4,7 @@ import {Request, Response} from 'express';
 import * as Busboy from 'busboy';
 import * as shortId from 'shortid';
 import * as fs from 'fs';
+import * as path from 'path';
 import ConversionManager from '../managers/ConversionManager';
 
 export default class IndexController {
@@ -30,7 +31,7 @@ export default class IndexController {
                     req.flash('error', 'Invalid file type');
                 }else{
                     let errored = false;
-                    let saveTo = __dirname + '../../../public/img/uploads/' + shortId.generate() + filename;
+                    let saveTo = path.join(__dirname, '/../../public/img/uploads/' + shortId.generate() + filename);
                     converter = new ConversionManager(saveTo);
 
                     file.on('limit', () => {
