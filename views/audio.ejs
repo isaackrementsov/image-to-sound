@@ -1,5 +1,6 @@
 <% include partials/header %>
 <h1>Sound Portrait</h1>
+<p style="margin-bottom: 30px;"><a href="/">Back</a></p>
 <audio id="audio">
     <source src="<%= path %>" type="audio/wav">
 </audio>
@@ -53,7 +54,7 @@
         if(!playing){
             playAudio();
         }
-        
+
         audio.currentTime = (e.clientX - playerBar.offsetLeft)/(playerBar.offsetWidth - 10) * duration;
     }
 </script>
